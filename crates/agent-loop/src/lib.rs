@@ -10,4 +10,4 @@ pub use feedback::{ClusterType, Feedback, FeedbackCluster, Severity};
 pub use halo::HaloScore;
 pub use handoff::{Handoff, HandoffChange};
 pub use source::{TraceError, TraceSource};
-pub use traces::TraceRecord;
+pub use traces::{TraceOutcome, TraceRecord};
