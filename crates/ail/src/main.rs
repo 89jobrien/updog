@@ -2,11 +2,8 @@ use clap::{Parser, Subcommand};
 use miette::Result;
 use tracing_subscriber::{EnvFilter, fmt};
 
-mod adapters;
-mod phase;
-mod phases;
-mod run;
-mod ui;
+use ail::adapters;
+use ail::run;
 
 #[derive(Parser)]
 #[command(
