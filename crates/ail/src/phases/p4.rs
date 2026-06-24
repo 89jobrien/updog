@@ -3,9 +3,12 @@ use std::fs;
 
 use agent_loop::{ChangeAction, ChangeItem, Diagnosis, Feedback, HaloScore};
 use anyhow::{Context, Result};
+use console::style;
+use tracing::debug;
 
 use crate::phase::Phase;
 use crate::run::RunConfig;
+use crate::ui;
 
 pub struct HaloDiagnosis;
 
@@ -21,7 +24,10 @@ impl Phase for HaloDiagnosis {
         let feedback_path = config.working_dir.join("feedback.json");
 
         if !feedback_path.exists() {
-            println!("No feedback.json — complete phases 1–2 first.");
+            ui::warn(format!(
+                "No feedback.json at {} — complete phases 1–2 first.",
+                ui::path_str(&feedback_path)
+            ));
             return Ok(());
         }
 
@@ -39,6 +45,8 @@ impl Phase for HaloDiagnosis {
             .collect();
 
         scored.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(Ordering::Equal));
+
+        debug!(count = scored.len(), "HALO scores computed");
 
         let changes: Vec<ChangeItem> = scored
             .iter()
@@ -66,21 +74,27 @@ impl Phase for HaloDiagnosis {
         let diagnosis_path = config.working_dir.join("diagnosis.json");
 
         if config.dry_run {
-            println!("[dry-run] diagnosis ({} changes):", diagnosis.changes.len());
+            ui::dry_run(format!(
+                "diagnosis ({} changes) → {}",
+                diagnosis.changes.len(),
+                ui::path_str(&diagnosis_path)
+            ));
             println!("{}", serde_json::to_string_pretty(&diagnosis)?);
             return Ok(());
         }
 
         fs::write(&diagnosis_path, serde_json::to_string_pretty(&diagnosis)?)?;
-        println!(
-            "Wrote diagnosis ({} changes) → {}",
+        ui::success(format!(
+            "diagnosis ({} changes) → {}",
             diagnosis.changes.len(),
-            diagnosis_path.display()
-        );
+            ui::path_str(&diagnosis_path)
+        ));
         for ch in &diagnosis.changes {
             println!(
-                "  #{} {} — halo={:.2}",
-                ch.rank, ch.cluster_id, ch.halo_score
+                "  {} {} {}",
+                style(format!("#{}", ch.rank)).dim(),
+                ch.cluster_id,
+                style(format!("halo={:.2}", ch.halo_score)).cyan()
             );
         }
 

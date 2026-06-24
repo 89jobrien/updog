@@ -55,15 +55,7 @@ pub fn execute(config: RunConfig) -> Result<()> {
         if phase.id() < config.start_phase {
             continue;
         }
-        if phase.optional() {
-            println!(
-                "\n--- Phase {} (optional): {} ---",
-                phase.id(),
-                phase.name()
-            );
-        } else {
-            println!("\n--- Phase {}: {} ---", phase.id(), phase.name());
-        }
+        crate::ui::phase_header(phase.id(), phase.name(), phase.optional());
         phase.run(&config)?;
     }
 

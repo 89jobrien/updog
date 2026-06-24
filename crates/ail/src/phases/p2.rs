@@ -1,7 +1,9 @@
 use anyhow::Result;
+use console::style;
 
 use crate::phase::Phase;
 use crate::run::RunConfig;
+use crate::ui;
 
 pub struct HumanFeedback;
 
@@ -17,10 +19,11 @@ impl Phase for HumanFeedback {
         let traces_path = config.working_dir.join("traces.json");
         let feedback_path = config.working_dir.join("feedback.json");
 
-        println!("Phase 2 requires human + LLM review.\n");
-        println!("Traces: {}", traces_path.display());
-        println!("\nLLM prompt template:");
-        println!("---");
+        ui::info("Phase 2 requires human + LLM review.");
+        ui::info(format!("Traces: {}", ui::path_str(&traces_path)));
+
+        println!("\n{}", style("LLM prompt template:").bold());
+        println!("{}", style("---").dim());
         println!(
             r#"Given these agent trace samples, identify:
 1. Patterns that should be blocked but aren't
@@ -43,14 +46,19 @@ Respond as JSON:
     }}
   ]
 }}"#,
-            traces_path.display()
+            ui::path_str(&traces_path)
         );
-        println!("---");
-        println!("\nWrite output to: {}", feedback_path.display());
-        println!(
-            "Then resume with: ail run --agent {} --since {} --phase 3",
-            config.agent, config.since
-        );
+        println!("{}", style("---").dim());
+
+        println!();
+        ui::info(format!("Write output to: {}", ui::path_str(&feedback_path)));
+        ui::info(format!(
+            "Then resume with: {}",
+            ui::code(format!(
+                "ail run --agent {} --since {} --phase 3",
+                config.agent, config.since
+            ))
+        ));
 
         Ok(())
     }

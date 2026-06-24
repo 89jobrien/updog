@@ -1,10 +1,12 @@
-use anyhow::Result;
 use clap::{Parser, Subcommand};
+use miette::Result;
+use tracing_subscriber::{EnvFilter, fmt};
 
 mod adapters;
 mod phase;
 mod phases;
 mod run;
+mod ui;
 
 #[derive(Parser)]
 #[command(
@@ -39,6 +41,14 @@ enum Command {
 }
 
 fn main() -> Result<()> {
+    fmt()
+        .with_env_filter(
+            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("warn")),
+        )
+        .with_target(false)
+        .without_time()
+        .init();
+
     let cli = Cli::parse();
     match cli.command {
         Command::Run {
@@ -48,8 +58,9 @@ fn main() -> Result<()> {
             dry_run,
         } => {
             let source = Box::new(adapters::coursers::CourserTraceSource);
-            let config = run::RunConfig::new(agent, since, phase, dry_run, source)?;
-            run::execute(config)?;
+            let config = run::RunConfig::new(agent, since, phase, dry_run, source)
+                .map_err(|e| miette::miette!("{e:#}"))?;
+            run::execute(config).map_err(|e| miette::miette!("{e:#}"))?;
         }
     }
     Ok(())

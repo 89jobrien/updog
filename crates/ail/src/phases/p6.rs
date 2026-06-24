@@ -2,6 +2,7 @@ use anyhow::Result;
 
 use crate::phase::Phase;
 use crate::run::RunConfig;
+use crate::ui;
 
 pub struct AutomationHeartbeat;
 
@@ -17,13 +18,16 @@ impl Phase for AutomationHeartbeat {
     }
 
     fn run(&self, config: &RunConfig) -> Result<()> {
-        println!("Enable to remove the human from routine low-risk changes.\n");
-        println!("Gate conditions before auto-triggering:");
-        println!("  - change type: add-rule | update-message | add-exception (not new-behavior)");
-        println!("  - HALO score >= 3.0");
-        println!("  - all eval IDs in the handoff must have a baseline result\n");
-        println!("Heartbeat: detect new HANDOFF.agent-improvement.*.md in .ctx/ and call Codex.");
-        println!("\nWorking dir: {}", config.working_dir.display());
+        ui::info("Enable to remove the human from routine low-risk changes.\n");
+        ui::info("Gate conditions before auto-triggering:");
+        ui::info("  - change type: add-rule | update-message | add-exception (not new-behavior)");
+        ui::info("  - HALO score >= 3.0");
+        ui::info("  - all eval IDs in the handoff must have a baseline result\n");
+        ui::info("Heartbeat: detect new HANDOFF.agent-improvement.*.md in .ctx/ and call Codex.");
+        ui::info(format!(
+            "Working dir: {}",
+            ui::path_str(&config.working_dir)
+        ));
 
         Ok(())
     }

@@ -4,9 +4,11 @@ use std::path::Path;
 use agent_loop::{Diagnosis, Handoff, HandoffChange};
 use anyhow::{Context, Result};
 use chrono::Utc;
+use tracing::debug;
 
 use crate::phase::Phase;
 use crate::run::RunConfig;
+use crate::ui;
 
 pub struct CodexHandoff;
 
@@ -22,7 +24,10 @@ impl Phase for CodexHandoff {
         let diagnosis_path = config.working_dir.join("diagnosis.json");
 
         if !diagnosis_path.exists() {
-            println!("No diagnosis.json — complete phase 4 first.");
+            ui::warn(format!(
+                "No diagnosis.json at {} — complete phase 4 first.",
+                ui::path_str(&diagnosis_path)
+            ));
             return Ok(());
         }
 
@@ -30,6 +35,8 @@ impl Phase for CodexHandoff {
             &fs::read_to_string(&diagnosis_path).context("reading diagnosis.json")?,
         )
         .context("parsing diagnosis.json")?;
+
+        debug!(changes = diagnosis.changes.len(), "building handoff");
 
         let handoff_changes: Vec<HandoffChange> = diagnosis
             .changes
@@ -61,17 +68,14 @@ impl Phase for CodexHandoff {
             Path::new(".ctx").join(format!("HANDOFF.agent-improvement.{}.md", config.agent));
 
         if config.dry_run {
-            println!(
-                "[dry-run] would write handoff to {}",
-                handoff_path.display()
-            );
+            ui::dry_run(format!("write handoff to {}", ui::path_str(&handoff_path)));
             println!("\n{}", md);
             return Ok(());
         }
 
         fs::create_dir_all(".ctx")?;
         fs::write(&handoff_path, &md)?;
-        println!("Wrote handoff → {}", handoff_path.display());
+        ui::success(format!("handoff → {}", ui::path_str(&handoff_path)));
 
         Ok(())
     }

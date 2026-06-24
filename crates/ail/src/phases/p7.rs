@@ -1,9 +1,11 @@
 use std::process::Command;
 
 use anyhow::Result;
+use tracing::warn;
 
 use crate::phase::Phase;
 use crate::run::RunConfig;
+use crate::ui;
 
 pub struct HarnessUpdate;
 
@@ -17,27 +19,41 @@ impl Phase for HarnessUpdate {
 
     fn run(&self, config: &RunConfig) -> Result<()> {
         if config.dry_run {
-            println!("[dry-run] crs validate");
-            println!("[dry-run] cargo nextest run --workspace");
+            ui::dry_run("crs validate");
+            ui::dry_run("cargo nextest run --workspace");
             return Ok(());
         }
 
-        println!("Running crs validate...");
+        ui::info("Running crs validate…");
         match Command::new("crs").arg("validate").status() {
-            Ok(s) if s.success() => println!("crs validate passed"),
-            Ok(s) => eprintln!("crs validate exited {s}"),
-            Err(e) => eprintln!("crs validate not available: {e}"),
+            Ok(s) if s.success() => ui::success("crs validate passed"),
+            Ok(s) => warn!(exit = %s, "crs validate failed"),
+            Err(e) => warn!(error = %e, "crs validate not available"),
         }
 
-        println!("\nNext steps:");
-        println!(
-            "  1. promptfoo eval --config {}",
-            config.working_dir.join("evals.yaml").display()
-        );
-        println!("  2. cargo nextest run --workspace  (in your project)");
-        println!("  3. git add <changed files>");
-        println!("  4. git commit -m 'fix(agent): <cluster_id> — <one-line diagnosis>'");
-        println!("  5. Archive: rename .ctx/HANDOFF.agent-improvement.*.md → *.completed");
+        println!();
+        ui::info("Next steps:");
+        ui::info(format!(
+            "  1. {}",
+            ui::code(format!(
+                "promptfoo eval --config {}",
+                config.working_dir.join("evals.yaml").display()
+            ))
+        ));
+        ui::info(format!(
+            "  2. {}",
+            ui::code("cargo nextest run --workspace")
+        ));
+        ui::info(format!("  3. {}", ui::code("git add <changed files>")));
+        ui::info(format!(
+            "  4. {}",
+            ui::code("git commit -m 'fix(agent): <cluster_id> — <diagnosis>'")
+        ));
+        ui::info(format!(
+            "  5. Archive: rename {} → {}",
+            ui::code("HANDOFF.agent-improvement.*.md"),
+            ui::code("*.completed")
+        ));
 
         Ok(())
     }
