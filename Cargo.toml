@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/agent-loop", "crates/ail"]
+members = ["crates/agent-loop", "crates/ail", "xtask"]
 resolver = "3"
 
 [workspace.package]

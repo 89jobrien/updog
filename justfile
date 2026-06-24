@@ -1,16 +1,20 @@
 default: ci
 
-# Run all CI checks locally via crux
+# Run all CI checks via cargo xtask
 ci:
-    crux run --target ci
+    cargo xtask ci
 
-# Run only lint checks
+# Run only fmt + clippy
 lint:
-    crux run --target lint
+    cargo xtask clippy
 
 # Run tests only
 test:
-    crux run --target test
+    cargo xtask test
+
+# Run all CI checks via crux pipeline
+ci-crux:
+    crux run --target ci
 
 # Run with smolvm — isolated Linux VM (requires smolvm on PATH)
 ci-vm:
