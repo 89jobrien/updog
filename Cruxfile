@@ -1,0 +1,36 @@
+project: updog
+default: ci
+budget: { calls: 20 }
+
+targets:
+  lint:
+    steps:
+      - join_all: checks
+        arms:
+          - step: fmt_check
+            handler: shell::capture
+            args:
+              cmd: "cargo fmt --all -- --check"
+          - step: clippy
+            handler: shell::capture
+            args:
+              cmd: "cargo clippy --workspace --all-targets -- -D warnings"
+
+  build:
+    depends: [lint]
+    steps:
+      - step: compile
+        handler: shell::capture
+        args:
+          cmd: "cargo build --workspace --all-targets"
+
+  test:
+    depends: [build]
+    steps:
+      - step: nextest
+        handler: shell::capture
+        args:
+          cmd: "cargo nextest run --workspace"
+
+  ci:
+    depends: [lint, build, test]
