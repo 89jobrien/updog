@@ -1,6 +1,8 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 
+mod adapters;
+mod phase;
 mod phases;
 mod run;
 
@@ -45,7 +47,8 @@ fn main() -> Result<()> {
             phase,
             dry_run,
         } => {
-            let config = run::RunConfig::new(agent, since, phase, dry_run)?;
+            let source = Box::new(adapters::coursers::CourserTraceSource);
+            let config = run::RunConfig::new(agent, since, phase, dry_run, source)?;
             run::execute(config)?;
         }
     }

@@ -1,8 +1,10 @@
 use std::path::PathBuf;
 
+use agent_loop::TraceSource;
 use anyhow::Result;
 use chrono::Utc;
 
+use crate::phase::Phase;
 use crate::phases::{p1, p2, p3, p4, p5, p6, p7};
 
 pub struct RunConfig {
@@ -11,10 +13,17 @@ pub struct RunConfig {
     pub start_phase: u8,
     pub dry_run: bool,
     pub working_dir: PathBuf,
+    pub source: Box<dyn TraceSource>,
 }
 
 impl RunConfig {
-    pub fn new(agent: String, since: u32, start_phase: u8, dry_run: bool) -> Result<Self> {
+    pub fn new(
+        agent: String,
+        since: u32,
+        start_phase: u8,
+        dry_run: bool,
+        source: Box<dyn TraceSource>,
+    ) -> Result<Self> {
         let date = Utc::now().format("%Y-%m-%d").to_string();
         let working_dir = PathBuf::from(".ctx/ail").join(&agent).join(&date);
         if !dry_run {
@@ -26,29 +35,36 @@ impl RunConfig {
             start_phase,
             dry_run,
             working_dir,
+            source,
         })
     }
 }
 
 pub fn execute(config: RunConfig) -> Result<()> {
-    type PhaseFn = fn(&RunConfig) -> Result<()>;
-
-    let phases: &[(u8, &str, PhaseFn)] = &[
-        (1, "SDK Traces", p1::run),
-        (2, "Human+LLM Feedback", p2::run),
-        (3, "Promptfoo Evals", p3::run),
-        (4, "HALO Diagnosis", p4::run),
-        (5, "Codex Handoff", p5::run),
-        (6, "Automation Heartbeat (optional)", p6::run),
-        (7, "Harness Update", p7::run),
+    let phases: Vec<Box<dyn Phase>> = vec![
+        Box::new(p1::SdkTraces),
+        Box::new(p2::HumanFeedback),
+        Box::new(p3::PromptfooEvals),
+        Box::new(p4::HaloDiagnosis),
+        Box::new(p5::CodexHandoff),
+        Box::new(p6::AutomationHeartbeat),
+        Box::new(p7::HarnessUpdate),
     ];
 
-    for (id, name, phase_fn) in phases {
-        if *id < config.start_phase {
+    for phase in &phases {
+        if phase.id() < config.start_phase {
             continue;
         }
-        println!("\n--- Phase {id}: {name} ---");
-        phase_fn(&config)?;
+        if phase.optional() {
+            println!(
+                "\n--- Phase {} (optional): {} ---",
+                phase.id(),
+                phase.name()
+            );
+        } else {
+            println!("\n--- Phase {}: {} ---", phase.id(), phase.name());
+        }
+        phase.run(&config)?;
     }
 
     Ok(())
