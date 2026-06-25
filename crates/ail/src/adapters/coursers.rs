@@ -50,34 +50,99 @@ impl TraceSource for CourserTraceSource {
             )));
         }
 
-        let parsed: DiscoverOutput = serde_json::from_slice(&out.stdout)
-            .map_err(|e| TraceError::Parse(format!("crs discover output: {e}")))?;
+        let json = String::from_utf8_lossy(&out.stdout);
+        parse_discover_output(&json)
+    }
+}
 
-        let mut records: Vec<TraceRecord> =
-            Vec::with_capacity(parsed.intercepted.len() + parsed.unhandled.len());
+pub(crate) fn parse_discover_output(json: &str) -> Result<Vec<TraceRecord>, TraceError> {
+    let parsed: DiscoverOutput = serde_json::from_str(json)
+        .map_err(|e| TraceError::Parse(format!("crs discover output: {e}")))?;
 
-        for r in parsed.intercepted {
-            records.push(TraceRecord {
-                command: r.example,
-                stem: r.stem,
-                count: r.count,
-                est_tokens: Some(r.est_tokens),
-                rule_id: Some(r.rule_id),
-                outcome: TraceOutcome::Intercepted,
-            });
-        }
+    let mut records: Vec<TraceRecord> =
+        Vec::with_capacity(parsed.intercepted.len() + parsed.unhandled.len());
 
-        for r in parsed.unhandled {
-            records.push(TraceRecord {
-                command: r.example,
-                stem: r.stem,
-                count: r.count,
-                est_tokens: None,
-                rule_id: None,
-                outcome: TraceOutcome::Unhandled,
-            });
-        }
+    for r in parsed.intercepted {
+        records.push(TraceRecord {
+            command: r.example,
+            stem: r.stem,
+            count: r.count,
+            est_tokens: Some(r.est_tokens),
+            rule_id: Some(r.rule_id),
+            outcome: TraceOutcome::Intercepted,
+        });
+    }
 
-        Ok(records)
+    for r in parsed.unhandled {
+        records.push(TraceRecord {
+            command: r.example,
+            stem: r.stem,
+            count: r.count,
+            est_tokens: None,
+            rule_id: None,
+            outcome: TraceOutcome::Unhandled,
+        });
+    }
+
+    Ok(records)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty_string_is_parse_error() {
+        let err = parse_discover_output("").unwrap_err();
+        assert!(matches!(err, TraceError::Parse(_)));
+    }
+
+    #[test]
+    fn invalid_json_is_parse_error() {
+        let err = parse_discover_output("not json").unwrap_err();
+        assert!(matches!(err, TraceError::Parse(_)));
+    }
+
+    #[test]
+    fn empty_output_returns_no_records() {
+        let json = r#"{"intercepted":[],"unhandled":[],"scanned_commands":0,"scanned_sessions":0}"#;
+        let records = parse_discover_output(json).unwrap();
+        assert!(records.is_empty());
+    }
+
+    #[test]
+    fn valid_output_maps_intercepted_and_unhandled() {
+        let json = r#"{
+            "intercepted": [
+                {
+                    "stem": "grep",
+                    "example": "grep -r foo .",
+                    "count": 3,
+                    "est_tokens": 120,
+                    "rule_id": "no-grep-use-rg"
+                }
+            ],
+            "unhandled": [
+                {
+                    "stem": "jq",
+                    "example": "jq '.' out.json",
+                    "count": 2
+                }
+            ]
+        }"#;
+        let records = parse_discover_output(json).unwrap();
+        assert_eq!(records.len(), 2);
+
+        let intercepted = records.iter().find(|r| r.stem == "grep").unwrap();
+        assert!(matches!(intercepted.outcome, TraceOutcome::Intercepted));
+        assert_eq!(intercepted.rule_id.as_deref(), Some("no-grep-use-rg"));
+        assert_eq!(intercepted.est_tokens, Some(120));
+        assert_eq!(intercepted.count, 3);
+
+        let unhandled = records.iter().find(|r| r.stem == "jq").unwrap();
+        assert!(matches!(unhandled.outcome, TraceOutcome::Unhandled));
+        assert!(unhandled.rule_id.is_none());
+        assert!(unhandled.est_tokens.is_none());
+        assert_eq!(unhandled.count, 2);
     }
 }
