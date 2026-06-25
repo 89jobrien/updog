@@ -4,8 +4,6 @@ use crate::phase::Phase;
 use crate::run::RunConfig;
 use crate::ui;
 
-// TODO(test/integration): add integration test for phase 6 — verify run() returns Ok and
-// produces expected ui output without side effects (phase is advisory-only for now)
 pub struct AutomationHeartbeat;
 
 impl Phase for AutomationHeartbeat {
