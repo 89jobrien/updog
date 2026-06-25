@@ -7,8 +7,6 @@ pub enum TraceOutcome {
     Unhandled,
 }
 
-// TODO(test/unit): add serde roundtrip tests for TraceRecord — both Intercepted and Unhandled
-// variants, with and without optional fields (est_tokens, rule_id)
 /// Normalized trace record — populated by any `TraceSource` implementation.
 ///
 /// Adapters map their native format to this type; callers of `TraceSource::collect`
@@ -26,4 +24,51 @@ pub struct TraceRecord {
     /// Rule that fired, if any.
     pub rule_id: Option<String>,
     pub outcome: TraceOutcome,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn trace_record_intercepted_roundtrip() {
+        let original = TraceRecord {
+            command: "crs discover".to_string(),
+            stem: "crs".to_string(),
+            count: 5,
+            est_tokens: Some(128),
+            rule_id: Some("rule-001".to_string()),
+            outcome: TraceOutcome::Intercepted,
+        };
+
+        let json = serde_json::to_string(&original).unwrap();
+        let deserialized: TraceRecord = serde_json::from_str(&json).unwrap();
+
+        assert_eq!(deserialized.command, original.command);
+        assert_eq!(deserialized.stem, original.stem);
+        assert_eq!(deserialized.count, original.count);
+        assert_eq!(deserialized.est_tokens, original.est_tokens);
+        assert_eq!(deserialized.rule_id, original.rule_id);
+    }
+
+    #[test]
+    fn trace_record_unhandled_roundtrip() {
+        let original = TraceRecord {
+            command: "unknown-cmd arg".to_string(),
+            stem: "unknown".to_string(),
+            count: 2,
+            est_tokens: None,
+            rule_id: None,
+            outcome: TraceOutcome::Unhandled,
+        };
+
+        let json = serde_json::to_string(&original).unwrap();
+        let deserialized: TraceRecord = serde_json::from_str(&json).unwrap();
+
+        assert_eq!(deserialized.command, original.command);
+        assert_eq!(deserialized.stem, original.stem);
+        assert_eq!(deserialized.count, original.count);
+        assert_eq!(deserialized.est_tokens, original.est_tokens);
+        assert_eq!(deserialized.rule_id, original.rule_id);
+    }
 }

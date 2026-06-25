@@ -39,10 +39,6 @@ pub enum TraceError {
 ///     }
 /// }
 /// ```
-// TODO(test/conformance): add a shared conformance harness fn assert_trace_source_contract<T:
-// TraceSource>(impl_under_test: T) — verify collect() returns Ok or a typed TraceError, never
-// panics, and result records have non-empty stems; reuse across CourserTraceSource and any
-// future adapters
 pub trait TraceSource {
     fn collect(&self, since_days: u32) -> Result<Vec<TraceRecord>, TraceError>;
 }
@@ -65,5 +61,56 @@ mod tests {
             !msg.contains("~/dev/"),
             "help must not contain tilde path, got: {msg}"
         );
+    }
+
+    fn assert_trace_source_contract<T: TraceSource>(source: T) {
+        // collect must return Ok or a typed TraceError, never panic
+        match source.collect(7) {
+            Ok(records) => {
+                for r in &records {
+                    assert!(!r.stem.is_empty(), "stem must be non-empty");
+                }
+            }
+            Err(TraceError::Unavailable(_)) => {}
+            Err(TraceError::Parse(_)) => {}
+        }
+    }
+
+    struct FakeSource(Vec<TraceRecord>);
+
+    impl TraceSource for FakeSource {
+        fn collect(&self, _since_days: u32) -> Result<Vec<TraceRecord>, TraceError> {
+            Ok(self.0.clone())
+        }
+    }
+
+    #[test]
+    fn fake_source_satisfies_contract() {
+        let records = vec![
+            TraceRecord {
+                command: "crs discover".to_string(),
+                stem: "crs".to_string(),
+                count: 1,
+                est_tokens: Some(50),
+                rule_id: Some("rule-1".to_string()),
+                outcome: crate::traces::TraceOutcome::Intercepted,
+            },
+            TraceRecord {
+                command: "echo test".to_string(),
+                stem: "echo".to_string(),
+                count: 2,
+                est_tokens: None,
+                rule_id: None,
+                outcome: crate::traces::TraceOutcome::Unhandled,
+            },
+        ];
+        let source = FakeSource(records);
+        assert_trace_source_contract(source);
+    }
+
+    #[test]
+    fn empty_source_satisfies_contract() {
+        let source = FakeSource(vec![]);
+        assert_trace_source_contract(source);
     }
 }
