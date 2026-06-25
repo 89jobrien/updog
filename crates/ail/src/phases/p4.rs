@@ -10,6 +10,24 @@ use crate::phase::Phase;
 use crate::run::RunConfig;
 use crate::ui;
 
+/// Policy constants for the diagnosis phase.
+///
+/// Extracted from hardcoded literals so the defaults are substitutable without
+/// touching the scoring logic.
+pub struct DiagnosisPolicy {
+    pub default_action: ChangeAction,
+    pub default_target_file: String,
+}
+
+impl Default for DiagnosisPolicy {
+    fn default() -> Self {
+        Self {
+            default_action: ChangeAction::AddRule,
+            default_target_file: "~/.config/coursers/course-correct-rules.json".to_string(),
+        }
+    }
+}
+
 pub struct HaloDiagnosis;
 
 impl Phase for HaloDiagnosis {
@@ -48,6 +66,8 @@ impl Phase for HaloDiagnosis {
 
         debug!(count = scored.len(), "HALO scores computed");
 
+        let policy = DiagnosisPolicy::default();
+
         let changes: Vec<ChangeItem> = scored
             .iter()
             .enumerate()
@@ -62,8 +82,8 @@ impl Phase for HaloDiagnosis {
                     cluster_id: cluster.id.clone(),
                     cluster_type: format!("{:?}", cluster.cluster_type),
                     halo_score: score.score,
-                    action: ChangeAction::AddRule,
-                    target_file: String::from("~/.config/coursers/course-correct-rules.json"),
+                    action: policy.default_action.clone(),
+                    target_file: policy.default_target_file.clone(),
                     evidence_count: cluster.evidence_count,
                     eval_ids: vec![],
                 }
@@ -99,5 +119,17 @@ impl Phase for HaloDiagnosis {
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn diagnosis_policy_default_values() {
+        let policy = DiagnosisPolicy::default();
+        assert_eq!(policy.default_action, ChangeAction::AddRule);
+        assert!(!policy.default_target_file.is_empty());
     }
 }

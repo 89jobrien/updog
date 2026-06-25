@@ -78,14 +78,14 @@ fn fake_feedback() -> Feedback {
 // ---------------------------------------------------------------------------
 
 fn config_in(dir: &TempDir, start_phase: u8) -> RunConfig {
-    RunConfig {
-        agent: String::from("test"),
-        since: 7,
+    RunConfig::new_with_dir(
+        String::from("test"),
+        7,
         start_phase,
-        dry_run: false,
-        working_dir: dir.path().to_path_buf(),
-        source: Box::new(FakeTraceSource(fake_traces())),
-    }
+        false,
+        dir.path().to_path_buf(),
+        Box::new(FakeTraceSource(fake_traces())),
+    )
 }
 
 // ---------------------------------------------------------------------------
@@ -177,14 +177,14 @@ fn phase5_writes_handoff_markdown() {
         fs::read_to_string(dir.path().join("diagnosis.json")).unwrap(),
     )
     .unwrap();
-    let config2 = RunConfig {
-        agent: String::from("test"),
-        since: 7,
-        start_phase: 5,
-        dry_run: true, // dry-run: prints but doesn't write to cwd
-        working_dir: dir2.path().to_path_buf(),
-        source: Box::new(FakeTraceSource(vec![])),
-    };
+    let config2 = RunConfig::new_with_dir(
+        String::from("test"),
+        7,
+        5,
+        true, // dry-run: prints but doesn't write to cwd
+        dir2.path().to_path_buf(),
+        Box::new(FakeTraceSource(vec![])),
+    );
     // Should not error even in dry-run
     execute(config2).unwrap();
 }
