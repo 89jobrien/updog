@@ -55,6 +55,10 @@ impl TraceSource for CourserTraceSource {
     }
 }
 
+// TODO(test/fuzz): add a fuzz target for parse_discover_output — it parses untrusted shell
+// output (arbitrary bytes from `crs discover`); target lives in fuzz/fuzz_targets/
+// TODO(test/property): add proptest covering arbitrary JSON strings — invariant: result is
+// either Ok(records where all counts > 0) or Err(Parse); never panics
 pub(crate) fn parse_discover_output(json: &str) -> Result<Vec<TraceRecord>, TraceError> {
     let parsed: DiscoverOutput = serde_json::from_str(json)
         .map_err(|e| TraceError::Parse(format!("crs discover output: {e}")))?;

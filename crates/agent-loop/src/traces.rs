@@ -7,6 +7,8 @@ pub enum TraceOutcome {
     Unhandled,
 }
 
+// TODO(test/unit): add serde roundtrip tests for TraceRecord — both Intercepted and Unhandled
+// variants, with and without optional fields (est_tokens, rule_id)
 /// Normalized trace record — populated by any `TraceSource` implementation.
 ///
 /// Adapters map their native format to this type; callers of `TraceSource::collect`

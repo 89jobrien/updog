@@ -22,6 +22,8 @@ pub struct Handoff {
 }
 
 impl Handoff {
+    // TODO(test/property): add proptest for to_markdown — invariant: output contains exactly
+    // self.changes.len() "### Change" headers; changes appear in the same order as the input Vec
     pub fn to_markdown(&self) -> String {
         let mut out = format!(
             "# Agent Improvement Handoff — {}\n\n",

@@ -39,6 +39,10 @@ pub enum TraceError {
 ///     }
 /// }
 /// ```
+// TODO(test/conformance): add a shared conformance harness fn assert_trace_source_contract<T:
+// TraceSource>(impl_under_test: T) — verify collect() returns Ok or a typed TraceError, never
+// panics, and result records have non-empty stems; reuse across CourserTraceSource and any
+// future adapters
 pub trait TraceSource {
     fn collect(&self, since_days: u32) -> Result<Vec<TraceRecord>, TraceError>;
 }

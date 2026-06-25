@@ -41,6 +41,8 @@ pub struct RunConfig {
 }
 
 impl RunConfig {
+    // TODO(test/unit): test RunConfig::new() working_dir derivation — assert path equals
+    // `.ctx/ail/<agent>/<YYYY-MM-DD>` using a known agent name and frozen date
     /// Standard constructor. Does not perform IO; call [`execute`] to run the loop.
     pub fn new(
         agent: String,

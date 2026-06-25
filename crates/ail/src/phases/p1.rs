@@ -7,6 +7,9 @@ use crate::phase::Phase;
 use crate::run::RunConfig;
 use crate::ui;
 
+// TODO(test/integration): phase 1 error path — when TraceSource::collect returns Err, phase
+// must warn and continue with an empty trace set (not propagate the error); assert traces.json
+// is written with an empty array
 pub struct SdkTraces;
 
 impl Phase for SdkTraces {

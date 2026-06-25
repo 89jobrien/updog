@@ -23,6 +23,8 @@ pub struct ChangeItem {
     pub eval_ids: Vec<String>,
 }
 
+// TODO(test/unit): add serde roundtrip tests for Diagnosis and ChangeItem — deserialize a
+// known JSON fixture and assert all fields, then re-serialize and compare
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Diagnosis {
     pub changes: Vec<ChangeItem>,

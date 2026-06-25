@@ -7,6 +7,8 @@ use crate::phase::Phase;
 use crate::run::RunConfig;
 use crate::ui;
 
+// TODO(test/integration): add integration test for phase 7 dry-run — verify dry_run=true
+// returns Ok and does not invoke crs validate or write any files
 pub struct HarnessUpdate;
 
 impl Phase for HarnessUpdate {

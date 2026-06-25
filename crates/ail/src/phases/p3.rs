@@ -8,6 +8,9 @@ use crate::phase::Phase;
 use crate::run::RunConfig;
 use crate::ui;
 
+// TODO(test/integration): add integration test for phase 3 — plant a feedback.json fixture,
+// run execute() starting at phase 3, assert evals.yaml is written and contains one comment
+// block per cluster
 pub struct PromptfooEvals;
 
 impl Phase for PromptfooEvals {

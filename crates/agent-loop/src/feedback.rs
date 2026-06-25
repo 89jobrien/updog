@@ -20,6 +20,8 @@ pub enum Severity {
 }
 
 impl Severity {
+    // TODO(test/unit): add unit tests for weight() covering all three variants (P1=3.0, P2=2.0,
+    // P3=1.0) — currently only tested indirectly via halo.rs
     pub fn weight(self) -> f64 {
         match self {
             Severity::P1 => 3.0,
