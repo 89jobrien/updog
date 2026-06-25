@@ -41,8 +41,6 @@ pub struct RunConfig {
 }
 
 impl RunConfig {
-    // TODO(test/unit): test RunConfig::new() working_dir derivation — assert path equals
-    // `.ctx/ail/<agent>/<YYYY-MM-DD>` using a known agent name and frozen date
     /// Standard constructor. Does not perform IO; call [`execute`] to run the loop.
     pub fn new(
         agent: String,
@@ -100,4 +98,31 @@ pub fn execute(config: RunConfig) -> Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use agent_loop::{TraceError, TraceRecord, TraceSource};
+
+    struct NoopSource;
+    impl TraceSource for NoopSource {
+        fn collect(&self, _: u32) -> Result<Vec<TraceRecord>, TraceError> {
+            Ok(vec![])
+        }
+    }
+
+    #[test]
+    fn new_working_dir_contains_agent_and_date() {
+        let config = RunConfig::new("myagent".to_string(), 7, 1, true, Box::new(NoopSource));
+        let dir = config.working_dir.to_string_lossy();
+        assert!(dir.contains("myagent"), "working_dir must contain agent name");
+        assert!(dir.contains(".ctx/ail"), "working_dir must be under .ctx/ail");
+        // date component: YYYY-MM-DD format
+        let parts: Vec<&str> = dir.split('/').collect();
+        let date_part = parts.last().unwrap();
+        assert_eq!(date_part.len(), 10, "date component must be YYYY-MM-DD");
+        assert_eq!(&date_part[4..5], "-");
+        assert_eq!(&date_part[7..8], "-");
+    }
 }

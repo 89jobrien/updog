@@ -55,11 +55,8 @@ impl TraceSource for CourserTraceSource {
     }
 }
 
-// TODO(test/fuzz): add a fuzz target for parse_discover_output — it parses untrusted shell
-// output (arbitrary bytes from `crs discover`); target lives in fuzz/fuzz_targets/
-// TODO(test/property): add proptest covering arbitrary JSON strings — invariant: result is
-// either Ok(records where all counts > 0) or Err(Parse); never panics
-pub(crate) fn parse_discover_output(json: &str) -> Result<Vec<TraceRecord>, TraceError> {
+// TODO(test/fuzz): fuzz target requires separate `cargo +nightly fuzz` and dedicated `fuzz/` crate
+pub fn parse_discover_output(json: &str) -> Result<Vec<TraceRecord>, TraceError> {
     let parsed: DiscoverOutput = serde_json::from_str(json)
         .map_err(|e| TraceError::Parse(format!("crs discover output: {e}")))?;
 
@@ -148,5 +145,27 @@ mod tests {
         assert!(unhandled.rule_id.is_none());
         assert!(unhandled.est_tokens.is_none());
         assert_eq!(unhandled.count, 2);
+    }
+
+    #[cfg(test)]
+    mod proptest {
+        use proptest::proptest;
+        use super::super::*;
+
+        proptest! {
+            #[test]
+            fn parse_never_panics_on_arbitrary_input(s in ".*") {
+                match parse_discover_output(&s) {
+                    Ok(_) => {}
+                    Err(TraceError::Parse(_)) => {}
+                    Err(TraceError::Unavailable(_)) => {
+                        panic!("parse_discover_output must not return Unavailable");
+                    }
+                    Err(_) => {
+                        panic!("parse_discover_output returned unknown error variant");
+                    }
+                }
+            }
+        }
     }
 }

@@ -9,8 +9,6 @@ use crate::phase::Phase;
 use crate::run::RunConfig;
 use crate::ui;
 
-// TODO(test/integration): phase 5 missing-diagnosis.json path — when diagnosis.json does not
-// exist, phase must warn and return Ok(()); assert no .ctx/ directory is created
 pub struct CodexHandoff;
 
 impl Phase for CodexHandoff {

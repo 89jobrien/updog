@@ -1,4 +1,4 @@
-# Agent Improvement Handoff — 2026-06-24
+# Agent Improvement Handoff — 2026-06-25
 
 ## Context
 
@@ -12,7 +12,6 @@ Agent: test. Loop iteration covering last 7 days of traces. Source: crs discover
 - **Action**: AddRule
 - **Evidence**: 13 occurrences
 - **Spec**:
-
 ```
 # TODO: fill in the exact JSON/TOML block to add or modify
 ```
@@ -23,7 +22,7 @@ Agent: test. Loop iteration covering last 7 days of traces. Source: crs discover
 - **Action**: AddRule
 - **Evidence**: 4 occurrences
 - **Spec**:
-
 ```
 # TODO: fill in the exact JSON/TOML block to add or modify
 ```
+

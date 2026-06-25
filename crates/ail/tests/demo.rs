@@ -6,6 +6,7 @@ use agent_loop::{
     ClusterType, Feedback, FeedbackCluster, Severity, TraceError, TraceOutcome, TraceRecord,
     TraceSource,
 };
+use anyhow::Result;
 use ail::run::{RunConfig, execute};
 use tempfile::TempDir;
 
@@ -248,4 +249,93 @@ fn phase5_returns_error_on_malformed_diagnosis_json() {
         execute(config).is_err(),
         "must error on malformed diagnosis.json"
     );
+}
+
+#[test]
+fn phase1_trace_source_error_writes_empty_traces() {
+    // When TraceSource::collect returns Err, phase 1 must warn and write an empty array
+    struct FailingSource;
+    impl TraceSource for FailingSource {
+        fn collect(&self, _: u32) -> Result<Vec<TraceRecord>, TraceError> {
+            Err(TraceError::Unavailable("test failure".to_string()))
+        }
+    }
+
+    let dir = TempDir::new().unwrap();
+    let config = RunConfig::new_with_dir(
+        "test".to_string(), 7, 1, false,
+        dir.path().to_path_buf(),
+        Box::new(FailingSource),
+    );
+    execute(config).unwrap(); // must not propagate the error
+
+    let raw = fs::read_to_string(dir.path().join("traces.json")).unwrap();
+    let records: Vec<TraceRecord> = serde_json::from_str(&raw).unwrap();
+    assert!(records.is_empty(), "error path must write empty traces array");
+}
+
+#[test]
+fn phase3_writes_evals_yaml_with_cluster_comments() {
+    let dir = TempDir::new().unwrap();
+    fs::write(
+        dir.path().join("feedback.json"),
+        serde_json::to_string(&fake_feedback()).unwrap(),
+    ).unwrap();
+
+    let config = RunConfig::new_with_dir(
+        "test".to_string(), 7, 3, false,
+        dir.path().to_path_buf(),
+        Box::new(FakeTraceSource(vec![])),
+    );
+    execute(config).unwrap();
+
+    let yaml = fs::read_to_string(dir.path().join("evals.yaml")).unwrap();
+    // fake_feedback() has 2 clusters — expect 2 cluster comment blocks
+    let cluster_count = yaml.matches("# --- cluster:").count();
+    assert_eq!(cluster_count, 2, "evals.yaml must have one block per cluster");
+}
+
+#[test]
+fn phase5_missing_diagnosis_json_returns_ok_no_ctx_dir() {
+    let dir = TempDir::new().unwrap();
+    // No diagnosis.json planted — phase 5 should warn and return Ok(())
+    let config = RunConfig::new_with_dir(
+        "test".to_string(), 7, 5, false,
+        dir.path().to_path_buf(),
+        Box::new(FakeTraceSource(vec![])),
+    );
+    execute(config).unwrap(); // must not error
+
+    // .ctx must NOT be created when diagnosis.json is missing
+    assert!(
+        !dir.path().join(".ctx").exists(),
+        ".ctx must not be created when diagnosis.json is absent"
+    );
+}
+
+#[test]
+fn phase6_advisory_run_returns_ok() {
+    let dir = TempDir::new().unwrap();
+    let config = RunConfig::new_with_dir(
+        "test".to_string(), 7, 6, false,
+        dir.path().to_path_buf(),
+        Box::new(FakeTraceSource(vec![])),
+    );
+    // Phase 6 is advisory — must always return Ok regardless of working dir contents
+    execute(config).unwrap();
+}
+
+#[test]
+fn phase7_dry_run_returns_ok_no_files_written() {
+    let dir = TempDir::new().unwrap();
+    let config = RunConfig::new_with_dir(
+        "test".to_string(), 7, 7, true, // dry_run = true
+        dir.path().to_path_buf(),
+        Box::new(FakeTraceSource(vec![])),
+    );
+    execute(config).unwrap();
+
+    // dry-run must not write any files
+    let entries: Vec<_> = fs::read_dir(dir.path()).unwrap().collect();
+    assert!(entries.is_empty(), "dry-run must not write any files to working_dir");
 }
