@@ -96,5 +96,5 @@ fn which(bin: &str) -> bool {
     Command::new("which")
         .arg(bin)
         .output()
-        .map_or(false, |o| o.status.success())
+        .is_ok_and(|o| o.status.success())
 }
