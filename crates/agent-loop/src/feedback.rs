@@ -20,14 +20,32 @@ pub enum Severity {
 }
 
 impl Severity {
-    // TODO(test/unit): add unit tests for weight() covering all three variants (P1=3.0, P2=2.0,
-    // P3=1.0) — currently only tested indirectly via halo.rs
     pub fn weight(self) -> f64 {
         match self {
             Severity::P1 => 3.0,
             Severity::P2 => 2.0,
             Severity::P3 => 1.0,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn severity_p1_weight_is_3() {
+        assert_eq!(Severity::P1.weight(), 3.0);
+    }
+
+    #[test]
+    fn severity_p2_weight_is_2() {
+        assert_eq!(Severity::P2.weight(), 2.0);
+    }
+
+    #[test]
+    fn severity_p3_weight_is_1() {
+        assert_eq!(Severity::P3.weight(), 1.0);
     }
 }
 

@@ -1,4 +1,15 @@
-generated: 2026-06-24
+generated: 2026-06-25
 since_days: 30
-sessions_scanned: 0
-total_commands: 0
+sessions_scanned: 1
+total_commands: 12
+top_supported:
+  - command: git diff
+    count: 1
+    rule: no-bash-use-nu
+    rtk_equivalent: rtk git
+    est_savings_tokens: 35
+    est_savings_pct: 80
+top_unhandled:
+  - base_command: nu
+    count: 11
+    example: "nu -c \"cat /Users/joe/dev/updog/Cargo.toml | grep 'version'\""

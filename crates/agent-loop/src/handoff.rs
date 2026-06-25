@@ -22,8 +22,6 @@ pub struct Handoff {
 }
 
 impl Handoff {
-    // TODO(test/property): add proptest for to_markdown — invariant: output contains exactly
-    // self.changes.len() "### Change" headers; changes appear in the same order as the input Vec
     pub fn to_markdown(&self) -> String {
         let mut out = format!(
             "# Agent Improvement Handoff — {}\n\n",
@@ -117,5 +115,54 @@ mod tests {
     fn to_markdown_without_eval_gate_omits_eval_section() {
         let md = sample_handoff().to_markdown();
         assert!(!md.contains("promptfoo"));
+    }
+
+    use proptest::prelude::*;
+
+    proptest! {
+        #[test]
+        fn prop_to_markdown_contains_correct_change_count(
+            changes in prop::collection::vec(
+                (
+                    0u32..100,
+                    "[a-z]{1,10}",
+                    "[a-z]{1,10}",
+                    "[a-z]{1,10}",
+                    0u32..100,
+                    "[a-z]{1,10}",
+                ),
+                0..10,
+            ),
+        ) {
+            let handoff = Handoff {
+                title: "Test".to_string(),
+                agent: "agent".to_string(),
+                date: Utc.with_ymd_and_hms(2026, 6, 24, 0, 0, 0).unwrap(),
+                context: "context".to_string(),
+                changes: changes
+                    .into_iter()
+                    .enumerate()
+                    .map(|(idx, (rank, cluster_id, action, file, evidence, spec))| HandoffChange {
+                        rank: rank.wrapping_add(idx as u32),
+                        cluster_id,
+                        target_file: file,
+                        action,
+                        evidence_count: evidence,
+                        eval_gate: None,
+                        spec,
+                    })
+                    .collect(),
+            };
+
+            let md = handoff.to_markdown();
+            let expected_count = handoff.changes.len();
+            let actual_count = md.matches("### Change").count();
+
+            prop_assert_eq!(
+                actual_count, expected_count,
+                "markdown should contain exactly {} '### Change' headers, found {}",
+                expected_count, actual_count
+            );
+        }
     }
 }
