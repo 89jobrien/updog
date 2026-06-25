@@ -6,13 +6,13 @@ Agent Improvement Loop — systematic agent behavior improvement from observed t
 
 `ail` runs a 7-phase loop that:
 
-1. Collects shell command traces from Claude Code sessions (`crs discover`)
-2. Sends them to an LLM for feedback clustering
-3. Parses the feedback into structured clusters
-4. Scores each cluster with a HALO score (High-impact, Actionable, Low-effort, Observable)
-5. Writes a ranked diagnosis
-6. Generates a rule candidate
-7. Produces a handoff document for the next session
+1. **SDK Traces** — collects shell command traces via `crs discover`
+2. **Human+LLM Feedback** — prompts for human + LLM review; produces `feedback.json`
+3. **Promptfoo Evals** — generates an eval template (`evals.yaml`) from feedback clusters
+4. **HALO Diagnosis** — scores each cluster (High-impact, Actionable, Low-effort, Observable); writes ranked `diagnosis.json`
+5. **Codex Handoff** — converts diagnosis into a `HANDOFF.agent-improvement.<agent>.md`
+6. **Automation Heartbeat** — optional; auto-triggers low-risk changes when gate conditions pass
+7. **Harness Update** — runs `crs validate` and walks through the commit + archive checklist
 
 ## Crates
 
@@ -21,6 +21,7 @@ Agent Improvement Loop — systematic agent behavior improvement from observed t
 | `agent-loop` | library      | Domain types: traces, feedback, HALO scoring, diagnosis, handoff. Defines the `TraceSource` port. |
 | `ail`        | binary + lib | CLI (`ail run`), phase implementations, `CourserTraceSource` adapter                              |
 | `xtask`      | binary       | Build task runner (`cargo xtask ci\|fmt\|clippy\|test`)                                           |
+| `fuzz`       | fuzz (excluded from workspace) | libFuzzer target for `parse_discover_output`; run with `cargo +nightly fuzz` |
 
 ## Quick start
 

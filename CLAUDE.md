@@ -3,11 +3,13 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this
 repository.
 
-Agent Improvement Loop workspace. Two crates:
+Agent Improvement Loop workspace. Four crates:
 
 - `agent-loop` — data model library (traces, feedback clusters, HALO scoring, diagnosis, handoff)
 - `ail` — binary CLI (`ail run [--agent] [--since] [--phase] [--dry-run]`)
 - `xtask` — build task runner (`cargo xtask ci|fmt|fmt-check|clippy|test`)
+- `fuzz` — libFuzzer targets (excluded from workspace); run with
+  `cargo +nightly fuzz run fuzz_parse_discover_output`
 
 ## Commands
 
