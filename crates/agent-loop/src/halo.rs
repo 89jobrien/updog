@@ -18,6 +18,7 @@ pub struct HaloScore {
 
 impl HaloScore {
     pub fn from_cluster(cluster: &FeedbackCluster, confidence: f64, effort: u8) -> Self {
+        assert!(effort > 0, "effort must be > 0 to avoid division by zero");
         let impact = cluster.evidence_count as f64 * cluster.severity.weight();
         let score = (impact * confidence) / effort as f64;
         Self {
@@ -33,6 +34,7 @@ impl HaloScore {
 #[cfg(test)]
 mod tests {
     use crate::feedback::{ClusterType, FeedbackCluster, Severity};
+    use proptest::prelude::*;
 
     use super::*;
 
@@ -83,5 +85,30 @@ mod tests {
         let c = cluster("x", Severity::P1, 0);
         let s = HaloScore::from_cluster(&c, 0.8, 2);
         assert_eq!(s.score, 0.0);
+    }
+
+    #[test]
+    #[should_panic(expected = "effort must be > 0 to avoid division by zero")]
+    fn halo_score_effort_zero_panics() {
+        let c = cluster("x", Severity::P1, 10);
+        let _ = HaloScore::from_cluster(&c, 0.8, 0);
+    }
+
+    #[test]
+    fn score_formula_p2() {
+        // impact = 10 * 2.0 = 20, score = (20 * 1.0) / 1 = 20.0
+        let c = cluster("x", Severity::P2, 10);
+        let s = HaloScore::from_cluster(&c, 1.0, 1);
+        assert!((s.score - 20.0).abs() < f64::EPSILON);
+        assert!((s.impact - 20.0).abs() < f64::EPSILON);
+    }
+
+    proptest! {
+        #[test]
+        fn halo_score_always_finite_for_nonzero_effort(effort in 1u8..=255u8) {
+            let c = cluster("x", Severity::P1, 10);
+            let s = HaloScore::from_cluster(&c, 0.8, effort);
+            prop_assert!(s.score.is_finite());
+        }
     }
 }
