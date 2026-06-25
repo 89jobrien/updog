@@ -4,9 +4,33 @@ use agent_loop::TraceSource;
 use anyhow::Result;
 use chrono::Utc;
 
-use crate::phase::Phase;
-use crate::phases::{p1, p2, p3, p4, p5, p6, p7};
+use crate::phases;
 
+/// Configuration for a single improvement loop run.
+///
+/// Construct with [`RunConfig::new`] (working dir derived from agent name + today's date)
+/// or [`RunConfig::new_with_dir`] (explicit working directory, useful in tests).
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use ail::run::{RunConfig, execute};
+/// use agent_loop::{TraceSource, TraceError, TraceRecord};
+///
+/// struct NoopSource;
+/// impl TraceSource for NoopSource {
+///     fn collect(&self, _: u32) -> Result<Vec<TraceRecord>, TraceError> { Ok(vec![]) }
+/// }
+///
+/// let config = RunConfig::new(
+///     "current".to_string(),
+///     30,
+///     1,
+///     true, // dry_run
+///     Box::new(NoopSource),
+/// );
+/// execute(config).unwrap();
+/// ```
 pub struct RunConfig {
     pub agent: String,
     pub since: u32,
@@ -63,15 +87,7 @@ pub fn execute(config: RunConfig) -> Result<()> {
         std::fs::create_dir_all(&config.working_dir)?;
     }
 
-    let phases: Vec<Box<dyn Phase>> = vec![
-        Box::new(p1::SdkTraces),
-        Box::new(p2::HumanFeedback),
-        Box::new(p3::PromptfooEvals),
-        Box::new(p4::HaloDiagnosis),
-        Box::new(p5::CodexHandoff),
-        Box::new(p6::AutomationHeartbeat),
-        Box::new(p7::HarnessUpdate),
-    ];
+    let phases = phases::all_phases();
 
     for phase in &phases {
         if phase.id() < config.start_phase {

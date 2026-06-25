@@ -30,6 +30,7 @@ targets:
       - step: nextest
         handler: shell::capture
         args:
+          # Requires cargo-nextest. Fallback: cargo test --workspace
           cmd: "cargo nextest run --workspace"
 
   ci:

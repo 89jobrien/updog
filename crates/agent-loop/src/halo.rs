@@ -17,6 +17,28 @@ pub struct HaloScore {
 }
 
 impl HaloScore {
+    /// Compute a HALO score for a feedback cluster.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `effort` is 0 (would produce division by zero).
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use agent_loop::{FeedbackCluster, ClusterType, Severity, HaloScore};
+    ///
+    /// let cluster = FeedbackCluster {
+    ///     id: "grep-fp".to_string(),
+    ///     cluster_type: ClusterType::FalsePositive,
+    ///     severity: Severity::P1,
+    ///     evidence_count: 10,
+    ///     sample: String::new(),
+    ///     diagnosis: String::new(),
+    /// };
+    /// let score = HaloScore::from_cluster(&cluster, 0.8, 2);
+    /// assert!((score.score - 12.0).abs() < f64::EPSILON); // (10 * 3.0 * 0.8) / 2
+    /// ```
     pub fn from_cluster(cluster: &FeedbackCluster, confidence: f64, effort: u8) -> Self {
         assert!(effort > 0, "effort must be > 0 to avoid division by zero");
         let impact = cluster.evidence_count as f64 * cluster.severity.weight();

@@ -4,7 +4,7 @@ default: ci
 ci:
     cargo xtask ci
 
-# Run only fmt + clippy
+# Run only clippy
 lint:
     cargo xtask clippy
 
@@ -22,4 +22,5 @@ ci-vm:
         "cd /workspace && cargo fmt --all -- --check && \
          cargo clippy --workspace --all-targets -- -D warnings && \
          cargo build --workspace --all-targets && \
-         cargo test --workspace"
+         cargo install cargo-nextest --locked && \
+         cargo nextest run --workspace"
