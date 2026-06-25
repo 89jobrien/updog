@@ -188,3 +188,64 @@ fn phase5_writes_handoff_markdown() {
     // Should not error even in dry-run
     execute(config2).unwrap();
 }
+
+#[test]
+fn phase5_writes_handoff_inside_working_dir() {
+    let dir = TempDir::new().unwrap();
+    fs::write(
+        dir.path().join("traces.json"),
+        serde_json::to_string(&fake_traces()).unwrap(),
+    )
+    .unwrap();
+    fs::write(
+        dir.path().join("feedback.json"),
+        serde_json::to_string(&fake_feedback()).unwrap(),
+    )
+    .unwrap();
+    // Run phases 4+5 (non-dry-run)
+    let config = config_in(&dir, 4);
+    execute(config).unwrap();
+    // .ctx must be created inside working_dir, not process cwd
+    let ctx_dir = dir.path().join(".ctx");
+    assert!(
+        ctx_dir.exists(),
+        ".ctx must be created inside working_dir, not process cwd"
+    );
+}
+
+#[test]
+fn phase4_returns_error_on_malformed_feedback_json() {
+    let dir = TempDir::new().unwrap();
+    fs::write(
+        dir.path().join("traces.json"),
+        serde_json::to_string(&fake_traces()).unwrap(),
+    )
+    .unwrap();
+    fs::write(dir.path().join("feedback.json"), b"not valid json").unwrap();
+    let config = config_in(&dir, 4);
+    assert!(
+        execute(config).is_err(),
+        "must error on malformed feedback.json"
+    );
+}
+
+#[test]
+fn phase5_returns_error_on_malformed_diagnosis_json() {
+    let dir = TempDir::new().unwrap();
+    fs::write(
+        dir.path().join("traces.json"),
+        serde_json::to_string(&fake_traces()).unwrap(),
+    )
+    .unwrap();
+    fs::write(
+        dir.path().join("feedback.json"),
+        serde_json::to_string(&fake_feedback()).unwrap(),
+    )
+    .unwrap();
+    fs::write(dir.path().join("diagnosis.json"), b"{ broken").unwrap();
+    let config = config_in(&dir, 5);
+    assert!(
+        execute(config).is_err(),
+        "must error on malformed diagnosis.json"
+    );
+}

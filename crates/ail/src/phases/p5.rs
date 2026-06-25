@@ -1,5 +1,4 @@
 use std::fs;
-use std::path::Path;
 
 use agent_loop::{Diagnosis, Handoff, HandoffChange};
 use anyhow::{Context, Result};
@@ -64,8 +63,8 @@ impl Phase for CodexHandoff {
         };
 
         let md = handoff.to_markdown();
-        let handoff_path =
-            Path::new(".ctx").join(format!("HANDOFF.agent-improvement.{}.md", config.agent));
+        let ctx_dir = config.working_dir.join(".ctx");
+        let handoff_path = ctx_dir.join(format!("HANDOFF.agent-improvement.{}.md", config.agent));
 
         if config.dry_run {
             ui::dry_run(format!("write handoff to {}", ui::path_str(&handoff_path)));
@@ -73,7 +72,7 @@ impl Phase for CodexHandoff {
             return Ok(());
         }
 
-        fs::create_dir_all(".ctx")?;
+        fs::create_dir_all(&ctx_dir)?;
         fs::write(&handoff_path, &md)?;
         ui::success(format!("handoff → {}", ui::path_str(&handoff_path)));
 
