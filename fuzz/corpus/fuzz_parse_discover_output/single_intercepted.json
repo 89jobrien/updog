@@ -1,0 +1,1 @@
+{"intercepted":[{"stem":"grep","example":"grep -r foo .","count":3,"est_tokens":120,"rule_id":"no-grep"}],"unhandled":[]}

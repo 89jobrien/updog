@@ -1,5 +1,6 @@
 [workspace]
 members = ["crates/agent-loop", "crates/ail", "xtask"]
+exclude = ["fuzz"]
 resolver = "3"
 
 [workspace.package]

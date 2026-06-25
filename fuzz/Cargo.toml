@@ -1,0 +1,16 @@
+[package]
+name = "updog-fuzz"
+version = "0.0.1"
+edition = "2024"
+publish = false
+
+[[bin]]
+name = "fuzz_parse_discover_output"
+path = "fuzz_targets/fuzz_parse_discover_output.rs"
+test = false
+doc = false
+
+[dependencies]
+libfuzzer-sys = "0.4"
+ail = { path = "../crates/ail" }
+agent-loop = { path = "../crates/agent-loop" }
