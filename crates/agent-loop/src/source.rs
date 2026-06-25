@@ -25,6 +25,20 @@ pub enum TraceError {
 ///
 /// Implement this trait to plug in any trace source — crs/coursers (default),
 /// LangSmith runs, OpenAI SDK traces, custom JSONL files, etc.
+///
+/// # Examples
+///
+/// ```rust
+/// use agent_loop::{TraceSource, TraceError, TraceRecord, TraceOutcome};
+///
+/// struct FakeSource(Vec<TraceRecord>);
+///
+/// impl TraceSource for FakeSource {
+///     fn collect(&self, _since_days: u32) -> Result<Vec<TraceRecord>, TraceError> {
+///         Ok(self.0.clone())
+///     }
+/// }
+/// ```
 pub trait TraceSource {
     fn collect(&self, since_days: u32) -> Result<Vec<TraceRecord>, TraceError>;
 }

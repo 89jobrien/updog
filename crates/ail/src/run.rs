@@ -6,6 +6,31 @@ use chrono::Utc;
 
 use crate::phases;
 
+/// Configuration for a single improvement loop run.
+///
+/// Construct with [`RunConfig::new`] (working dir derived from agent name + today's date)
+/// or [`RunConfig::new_with_dir`] (explicit working directory, useful in tests).
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use ail::run::{RunConfig, execute};
+/// use agent_loop::{TraceSource, TraceError, TraceRecord};
+///
+/// struct NoopSource;
+/// impl TraceSource for NoopSource {
+///     fn collect(&self, _: u32) -> Result<Vec<TraceRecord>, TraceError> { Ok(vec![]) }
+/// }
+///
+/// let config = RunConfig::new(
+///     "current".to_string(),
+///     30,
+///     1,
+///     true, // dry_run
+///     Box::new(NoopSource),
+/// );
+/// execute(config).unwrap();
+/// ```
 pub struct RunConfig {
     pub agent: String,
     pub since: u32,
