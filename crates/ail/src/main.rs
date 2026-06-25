@@ -55,8 +55,7 @@ fn main() -> Result<()> {
             dry_run,
         } => {
             let source = Box::new(adapters::coursers::CourserTraceSource);
-            let config = run::RunConfig::new(agent, since, phase, dry_run, source)
-                .map_err(|e| miette::miette!("{e:#}"))?;
+            let config = run::RunConfig::new(agent, since, phase, dry_run, source);
             run::execute(config).map_err(|e| miette::miette!("{e:#}"))?;
         }
     }
