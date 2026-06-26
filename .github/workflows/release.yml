@@ -1,27 +1,27 @@
-name: CI
+name: Release
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    tags:
+      - 'agent-loop-v*'
+      - 'ail-v*'
 
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
 
 jobs:
-  ci:
-    name: ci
+  release:
+    name: release
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
 
       - name: Cache cargo registry
         uses: actions/cache@v4
@@ -43,5 +43,10 @@ jobs:
       - name: rail unify --check
         run: cargo rail unify --check
 
-      - name: ci
+      - name: ci gate
         run: cargo xtask ci
+
+      - name: publish (crates.io)
+        run: cargo xtask rail-release
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}

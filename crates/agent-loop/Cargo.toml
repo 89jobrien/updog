@@ -6,7 +6,7 @@ license.workspace   = true
 repository.workspace = true
 
 [dev-dependencies]
-proptest = "1"
+proptest = { workspace = true } #unified
 
 [dependencies]
 chrono     = { workspace = true }

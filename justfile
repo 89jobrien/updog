@@ -1,6 +1,6 @@
 default: ci
 
-# Run all CI checks via cargo xtask
+# Run all CI checks via cargo xtask (includes rail unify --check)
 ci:
     cargo xtask ci
 
@@ -11,6 +11,18 @@ lint:
 # Run tests only
 test:
     cargo xtask test
+
+# Run rail CI surface (build + test, all crates, change-aware)
+rail-ci:
+    cargo xtask rail-ci
+
+# Publish to crates.io via cargo rail release
+rail-release:
+    cargo xtask rail-release
+
+# Check workspace dependency unification (non-destructive)
+rail-check:
+    cargo rail unify --check
 
 # Run all CI checks via crux pipeline
 ci-crux:

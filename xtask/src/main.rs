@@ -10,14 +10,16 @@ fn main() -> ExitCode {
         Some("fmt-check") => fmt(true),
         Some("clippy") => clippy(),
         Some("test") => test(),
+        Some("rail-ci") => rail_ci(),
+        Some("rail-release") => rail_release(),
         Some(t) => {
             eprintln!("unknown task: {t}");
-            eprintln!("available: ci, fmt, fmt-check, clippy, test");
+            eprintln!("available: ci, fmt, fmt-check, clippy, test, rail-ci, rail-release");
             return ExitCode::FAILURE;
         }
         None => {
             eprintln!("usage: cargo xtask <task>");
-            eprintln!("available: ci, fmt, fmt-check, clippy, test");
+            eprintln!("available: ci, fmt, fmt-check, clippy, test, rail-ci, rail-release");
             return ExitCode::FAILURE;
         }
     };
@@ -31,9 +33,43 @@ fn main() -> ExitCode {
 }
 
 fn ci() -> Result {
+    rail_unify_check()?;
     fmt(true)?;
     clippy()?;
     test()
+}
+
+/// Run cargo rail unify --check (fails if workspace deps are out of sync).
+fn rail_unify_check() -> Result {
+    let mut cmd = Command::new("cargo");
+    cmd.args(["rail", "unify", "--check"]);
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("xtask must be inside workspace");
+    cmd.current_dir(root);
+    run(cmd)
+}
+
+/// Run the full rail CI surface (build + test, all crates).
+fn rail_ci() -> Result {
+    let mut cmd = Command::new("cargo");
+    cmd.args(["rail", "run", "--all", "--surface", "build", "--surface", "test"]);
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("xtask must be inside workspace");
+    cmd.current_dir(root);
+    run(cmd)
+}
+
+/// Publish to crates.io via cargo rail release.
+fn rail_release() -> Result {
+    let mut cmd = Command::new("cargo");
+    cmd.args(["rail", "release"]);
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("xtask must be inside workspace");
+    cmd.current_dir(root);
+    run(cmd)
 }
 
 fn fmt(check: bool) -> Result {
