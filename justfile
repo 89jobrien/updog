@@ -24,6 +24,10 @@ rail-release:
 rail-check:
     cargo rail unify --check
 
+# Generate SARIF reports from clippy and cargo rail → target/*.sarif
+sarif:
+    cargo xtask sarif
+
 # Run all CI checks via crux pipeline
 ci-crux:
     crux run --target ci

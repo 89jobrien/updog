@@ -45,3 +45,21 @@ jobs:
 
       - name: ci
         run: cargo xtask ci
+
+      - name: Generate SARIF reports
+        run: cargo xtask sarif
+        continue-on-error: true
+
+      - name: Upload clippy SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: target/clippy.sarif
+          category: clippy
+
+      - name: Upload rail SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: target/rail-unify.sarif
+          category: cargo-rail

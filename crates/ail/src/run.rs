@@ -116,8 +116,14 @@ mod tests {
     fn new_working_dir_contains_agent_and_date() {
         let config = RunConfig::new("myagent".to_string(), 7, 1, true, Box::new(NoopSource));
         let dir = config.working_dir.to_string_lossy();
-        assert!(dir.contains("myagent"), "working_dir must contain agent name");
-        assert!(dir.contains(".ctx/ail"), "working_dir must be under .ctx/ail");
+        assert!(
+            dir.contains("myagent"),
+            "working_dir must contain agent name"
+        );
+        assert!(
+            dir.contains(".ctx/ail"),
+            "working_dir must be under .ctx/ail"
+        );
         // date component: YYYY-MM-DD format
         let parts: Vec<&str> = dir.split('/').collect();
         let date_part = parts.last().unwrap();

@@ -6,8 +6,8 @@ use agent_loop::{
     ClusterType, Feedback, FeedbackCluster, Severity, TraceError, TraceOutcome, TraceRecord,
     TraceSource,
 };
-use anyhow::Result;
 use ail::run::{RunConfig, execute};
+use anyhow::Result;
 use tempfile::TempDir;
 
 // ---------------------------------------------------------------------------
@@ -67,7 +67,7 @@ fn fake_feedback() -> Feedback {
                 cluster_type: ClusterType::FalsePositive,
                 severity: Severity::P1,
                 evidence_count: 13,
-                sample: String::from("grep -r TODO ."),
+                sample: String::from("nu << 'EOF'\nls\nEOF"),
                 diagnosis: String::from("no-grep-use-tool fires on rg aliases too"),
             },
         ],
@@ -263,7 +263,10 @@ fn phase1_trace_source_error_writes_empty_traces() {
 
     let dir = TempDir::new().unwrap();
     let config = RunConfig::new_with_dir(
-        "test".to_string(), 7, 1, false,
+        "test".to_string(),
+        7,
+        1,
+        false,
         dir.path().to_path_buf(),
         Box::new(FailingSource),
     );
@@ -271,28 +274,55 @@ fn phase1_trace_source_error_writes_empty_traces() {
 
     let raw = fs::read_to_string(dir.path().join("traces.json")).unwrap();
     let records: Vec<TraceRecord> = serde_json::from_str(&raw).unwrap();
-    assert!(records.is_empty(), "error path must write empty traces array");
+    assert!(
+        records.is_empty(),
+        "error path must write empty traces array"
+    );
 }
 
 #[test]
-fn phase3_writes_evals_yaml_with_cluster_comments() {
+fn phase3_writes_runnable_promptfoo_evals_yaml() {
     let dir = TempDir::new().unwrap();
     fs::write(
         dir.path().join("feedback.json"),
         serde_json::to_string(&fake_feedback()).unwrap(),
-    ).unwrap();
+    )
+    .unwrap();
 
     let config = RunConfig::new_with_dir(
-        "test".to_string(), 7, 3, false,
+        "test".to_string(),
+        7,
+        3,
+        false,
         dir.path().to_path_buf(),
         Box::new(FakeTraceSource(vec![])),
     );
     execute(config).unwrap();
 
     let yaml = fs::read_to_string(dir.path().join("evals.yaml")).unwrap();
-    // fake_feedback() has 2 clusters — expect 2 cluster comment blocks
-    let cluster_count = yaml.matches("# --- cluster:").count();
-    assert_eq!(cluster_count, 2, "evals.yaml must have one block per cluster");
+    assert!(
+        yaml.contains("prompts:\n  - |"),
+        "evals.yaml must include a Promptfoo prompt"
+    );
+    assert!(
+        yaml.contains("providers:\n  - echo"),
+        "evals.yaml must include a local baseline provider"
+    );
+    assert!(yaml.contains("tests:\n"), "evals.yaml must include tests");
+    assert!(
+        yaml.contains("  - vars:\n"),
+        "evals.yaml must include runnable test cases"
+    );
+
+    let cluster_count = yaml.matches("      cluster_id: |-").count();
+    assert_eq!(
+        cluster_count, 2,
+        "evals.yaml must have one test per cluster"
+    );
+    assert!(
+        yaml.contains("      diagnosis: |-"),
+        "evals.yaml must include cluster diagnoses as test vars"
+    );
 }
 
 #[test]
@@ -300,7 +330,10 @@ fn phase5_missing_diagnosis_json_returns_ok_no_ctx_dir() {
     let dir = TempDir::new().unwrap();
     // No diagnosis.json planted — phase 5 should warn and return Ok(())
     let config = RunConfig::new_with_dir(
-        "test".to_string(), 7, 5, false,
+        "test".to_string(),
+        7,
+        5,
+        false,
         dir.path().to_path_buf(),
         Box::new(FakeTraceSource(vec![])),
     );
@@ -317,7 +350,10 @@ fn phase5_missing_diagnosis_json_returns_ok_no_ctx_dir() {
 fn phase6_advisory_run_returns_ok() {
     let dir = TempDir::new().unwrap();
     let config = RunConfig::new_with_dir(
-        "test".to_string(), 7, 6, false,
+        "test".to_string(),
+        7,
+        6,
+        false,
         dir.path().to_path_buf(),
         Box::new(FakeTraceSource(vec![])),
     );
@@ -329,7 +365,10 @@ fn phase6_advisory_run_returns_ok() {
 fn phase7_dry_run_returns_ok_no_files_written() {
     let dir = TempDir::new().unwrap();
     let config = RunConfig::new_with_dir(
-        "test".to_string(), 7, 7, true, // dry_run = true
+        "test".to_string(),
+        7,
+        7,
+        true, // dry_run = true
         dir.path().to_path_buf(),
         Box::new(FakeTraceSource(vec![])),
     );
@@ -337,5 +376,8 @@ fn phase7_dry_run_returns_ok_no_files_written() {
 
     // dry-run must not write any files
     let entries: Vec<_> = fs::read_dir(dir.path()).unwrap().collect();
-    assert!(entries.is_empty(), "dry-run must not write any files to working_dir");
+    assert!(
+        entries.is_empty(),
+        "dry-run must not write any files to working_dir"
+    );
 }
