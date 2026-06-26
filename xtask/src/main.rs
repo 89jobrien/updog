@@ -16,16 +16,12 @@ fn main() -> ExitCode {
         Some("sarif") => sarif(),
         Some(t) => {
             eprintln!("unknown task: {t}");
-            eprintln!(
-                "available: ci, fmt, fmt-check, clippy, test, rail-ci, rail-release, sarif"
-            );
+            eprintln!("available: ci, fmt, fmt-check, clippy, test, rail-ci, rail-release, sarif");
             return ExitCode::FAILURE;
         }
         None => {
             eprintln!("usage: cargo xtask <task>");
-            eprintln!(
-                "available: ci, fmt, fmt-check, clippy, test, rail-ci, rail-release, sarif"
-            );
+            eprintln!("available: ci, fmt, fmt-check, clippy, test, rail-ci, rail-release, sarif");
             return ExitCode::FAILURE;
         }
     };
@@ -59,7 +55,15 @@ fn rail_unify_check() -> Result {
 /// Run the full rail CI surface (build + test, all crates).
 fn rail_ci() -> Result {
     let mut cmd = Command::new("cargo");
-    cmd.args(["rail", "run", "--all", "--surface", "build", "--surface", "test"]);
+    cmd.args([
+        "rail",
+        "run",
+        "--all",
+        "--surface",
+        "build",
+        "--surface",
+        "test",
+    ]);
     let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
         .parent()
         .expect("xtask must be inside workspace");
@@ -132,7 +136,12 @@ fn sarif() -> Result {
     }
     let cargo_bin = std::env::var("CARGO").unwrap_or_else(|_| "cargo".into());
     let clippy_proc = Command::new(&cargo_bin)
-        .args(["clippy", "--workspace", "--all-targets", "--message-format=json"])
+        .args([
+            "clippy",
+            "--workspace",
+            "--all-targets",
+            "--message-format=json",
+        ])
         .current_dir(root)
         .stdout(Stdio::piped())
         .stderr(Stdio::inherit())
