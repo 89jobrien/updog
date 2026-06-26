@@ -58,7 +58,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload clippy SARIF
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         continue-on-error: true
         with:
@@ -66,7 +66,7 @@ jobs:
           category: clippy
 
       - name: Upload rail SARIF
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         continue-on-error: true
         with:
