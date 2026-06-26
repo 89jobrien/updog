@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  security-events: write
+
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
@@ -40,6 +44,9 @@ jobs:
       - name: Install cargo-rail
         run: cargo install cargo-rail --locked
 
+      - name: Install clippy-sarif
+        run: cargo install clippy-sarif --locked
+
       - name: rail unify --check
         run: cargo rail unify --check
 
@@ -53,6 +60,7 @@ jobs:
       - name: Upload clippy SARIF
         uses: github/codeql-action/upload-sarif@v3
         if: always()
+        continue-on-error: true
         with:
           sarif_file: target/clippy.sarif
           category: clippy
@@ -60,6 +68,7 @@ jobs:
       - name: Upload rail SARIF
         uses: github/codeql-action/upload-sarif@v3
         if: always()
+        continue-on-error: true
         with:
           sarif_file: target/rail-unify.sarif
           category: cargo-rail
