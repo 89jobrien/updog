@@ -1,0 +1,17 @@
+{
+  "date": "2026-06-28",
+  "clippy_warnings": 0,
+  "tests_pass": 44,
+  "tests_fail": 0,
+  "tests_skip": 0,
+  "todos_source": 2,
+  "todos_test_fixtures": 1,
+  "dep_inconsistencies": 0,
+  "rail_unify_opportunities": 0,
+  "msrv": "1.87.0",
+  "crate_versions": {
+    "agent-loop": "0.1.0",
+    "ail": "0.1.0",
+    "xtask": "0.1.0"
+  }
+}

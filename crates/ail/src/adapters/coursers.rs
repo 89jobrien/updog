@@ -55,7 +55,6 @@ impl TraceSource for CourserTraceSource {
     }
 }
 
-// TODO(test/fuzz): fuzz target requires separate `cargo +nightly fuzz` and dedicated `fuzz/` crate
 pub fn parse_discover_output(json: &str) -> Result<Vec<TraceRecord>, TraceError> {
     let parsed: DiscoverOutput = serde_json::from_str(json)
         .map_err(|e| TraceError::Parse(format!("crs discover output: {e}")))?;
