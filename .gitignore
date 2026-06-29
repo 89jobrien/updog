@@ -1,5 +1,7 @@
 /target/
 fuzz/target/
+# Generated fuzz corpus — keep only hand-crafted seeds committed explicitly
+fuzz/corpus/fuzz_parse_discover_output/[0-9a-f][0-9a-f][0-9a-f]*
 .ctx/ail/
 Cargo.lock
 

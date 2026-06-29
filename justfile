@@ -28,6 +28,11 @@ rail-check:
 sarif:
     cargo xtask sarif
 
+# Install clippy-sarif if missing, then generate SARIF reports
+sarif-check:
+    @which clippy-sarif > /dev/null 2>&1 || cargo install clippy-sarif --locked
+    cargo xtask sarif
+
 # Run all CI checks via crux pipeline
 ci-crux:
     crux run --target ci

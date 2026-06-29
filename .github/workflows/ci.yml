@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [main]
 
+# security-events: write is required for github/codeql-action/upload-sarif
 permissions:
   contents: read
   security-events: write
