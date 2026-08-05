@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand};
+use clap::{CommandFactory, Parser, Subcommand};
 use miette::Result;
 use tracing_subscriber::{EnvFilter, fmt};
 
@@ -38,6 +38,16 @@ enum Command {
 }
 
 fn main() -> Result<()> {
+    if std::env::args().nth(1).as_deref() == Some("completions") {
+        clap_complete::generate(
+            clap_complete_nushell::Nushell,
+            &mut Cli::command(),
+            "ail",
+            &mut std::io::stdout(),
+        );
+        return Ok(());
+    }
+
     fmt()
         .with_env_filter(
             EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("warn")),
@@ -47,6 +57,7 @@ fn main() -> Result<()> {
         .init();
 
     let cli = Cli::parse();
+
     match cli.command {
         Command::Run {
             agent,
