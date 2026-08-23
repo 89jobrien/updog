@@ -1,0 +1,52 @@
+timestamp: 2026-08-23T00:00:00Z
+generated_by: handoff-session-sweep
+
+# Repository Status
+repo: updog
+branch: main
+head_sha: cf11c73bd5b1815d63533dcbf340de146bce3c75
+committed: 2026-08-05T14:10:15-0400
+
+# Git State
+commits_since_last_handoff: 10
+last_handoff_commit: d28c7c0 (handoff: update workflow state for 2026-06-25)
+dirty: true
+dirty_summary: |
+  Modified: .ctx/HANDOFF.tools.yaml (tool usage analytics update)
+  Untracked: .DS_Store, .taskit-cache/, rustic.toml
+
+# Upstream Status
+pushed: "0 ahead, 0 behind upstream (synced)"
+
+# Tests
+tests_status: "passed"
+test_summary: "cargo check --workspace: OK (exit 0)"
+
+# Recent Commits (10 since last HANDOFF)
+recent_commits:
+  - cf11c73 feat: add Nushell completion generation
+  - 59220f6 chore: self-review improvements
+  - a60d7bb docs: add AGENTS.md for Codex CLI agent support
+  - 439b9a9 chore(health): baseline report, remove stale fuzz TODO in coursers.rs
+  - 14a7f06 chore(ci): bump codeql-action v3 -> v4
+  - 9328057 fix(ci): add clippy-sarif install, security-events permission, continue-on-error for SARIF uploads
+  - e0504cc style(xtask): rustfmt line-length fixes
+  - 650e16c feat(sarif): cargo rail integration, SARIF output, release workflow
+  - 47ce1c5 feat(rail): integrate cargo-rail for ci, crates.io, and gh workflows
+  - 74b4c96 fix(fuzz): add cargo-fuzz manifest metadata
+
+# Project Context
+description: "Rust CLI/xtask project: cargo rail tooling for CI linting, SARIF output, health baseline tracking"
+crates:
+  - agent-loop (library: traces, feedback, HALO scoring, diagnosis, handoff)
+  - ail (binary: CLI driver for phases 1-7)
+  - xtask (build tasks: ci, fmt, clippy, test)
+  - fuzz (libFuzzer targets, excluded from workspace)
+
+# Blockers/Notes
+notes: |
+  - Last HANDOFF from 2026-06-25 (nearly 2 months old)
+  - 10 commits include feature additions (Nushell completion, SARIF output, cargo-rail integration)
+  - Tool usage analytics updated (HANDOFF.tools.yaml): 98 total commands scanned over 30 days
+  - Top actionable pattern: 96 unhandled `nu -c` invocations in cargo rail workflow
+  - Build health: check passes, no blocker artifacts
