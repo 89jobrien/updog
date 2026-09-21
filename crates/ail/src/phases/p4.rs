@@ -1,3 +1,5 @@
+//! Phase 4: score feedback with HALO and rank proposed changes.
+
 use std::cmp::Ordering;
 use std::fs;
 

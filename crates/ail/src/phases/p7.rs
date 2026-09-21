@@ -1,3 +1,5 @@
+//! Phase 7: validate harness changes and print completion steps.
+
 use std::process::Command;
 
 use anyhow::Result;

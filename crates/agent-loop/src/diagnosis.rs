@@ -1,3 +1,5 @@
+//! Ranked harness changes produced by HALO diagnosis.
+
 use serde::{Deserialize, Serialize};
 
 #[non_exhaustive]

@@ -1,3 +1,5 @@
+//! Phase 5: convert a ranked diagnosis into a Codex handoff.
+
 use std::fs;
 
 use agent_loop::{Diagnosis, Handoff, HandoffChange};

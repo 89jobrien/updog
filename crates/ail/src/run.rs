@@ -1,3 +1,5 @@
+//! Run configuration and sequential phase execution.
+
 use std::path::PathBuf;
 
 use agent_loop::TraceSource;
@@ -82,6 +84,7 @@ impl RunConfig {
     }
 }
 
+/// Runs configured phases in order, beginning with `start_phase`.
 pub fn execute(config: RunConfig) -> Result<()> {
     if !config.dry_run {
         std::fs::create_dir_all(&config.working_dir)?;

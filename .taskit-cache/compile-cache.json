@@ -1,0 +1,47 @@
+{
+  "cargo_lock_hash": "defd30e480d82c7218a080fc1f9d87d437b22778b747d485b6d696cf6e9dfad6",
+  "crates": {
+    "agent-loop": {
+      "hash": "63e1c98295c18cfa00f7a440bd311ac315667cb44f46c62a1cd46f3d73def97c",
+      "modules": {
+        "./crates/agent-loop/Cargo.toml": "5c24d6d696cbf59addac77bb177a8d4af394945ecbceabaa44e93632df6c2ab7",
+        "./crates/agent-loop/src/diagnosis.rs": "c90502d4401345c9cb3472bf6978ef72d4bbe425da0265e9bbd8c5bc09445594",
+        "./crates/agent-loop/src/feedback.rs": "60efb85c3576865ec1db3fc86d5bbd6542debb484b70a2f0ad13540e133745c9",
+        "./crates/agent-loop/src/halo.rs": "abe6cd59e5fd3f65f1e78ba542d716133d9b7902cae41e73d0ae3a67a67ac1b1",
+        "./crates/agent-loop/src/handoff.rs": "af9e7a78a28168714890a18139a208eb5e41889725b48840edd79fced1c8bdab",
+        "./crates/agent-loop/src/lib.rs": "16e9a8f7a59fd4927fbbf9819cb819886ddea6629de5e5ea9e2b610824407346",
+        "./crates/agent-loop/src/source.rs": "8196606e51c12e8890e6db03475dc74295edcd6d506143437ec0d53226d8e88c",
+        "./crates/agent-loop/src/traces.rs": "c7e013278176b814de79de1c344efe033e0196ac0ab819c1f706afc4904f9cc7"
+      }
+    },
+    "ail": {
+      "hash": "cfa7bc27e16cf8a7c45721f81e019e964fedfbf654e19501f2f3f1162901af35",
+      "modules": {
+        "./crates/ail/Cargo.toml": "80806e8618ef3cd596538935e08f8b3a3ed476b60c8df131313e11003840c155",
+        "./crates/ail/src/adapters/coursers.rs": "469db6748416182dace36e76ce485c6392ab0f25a1ac273b3b11fafece839c95",
+        "./crates/ail/src/adapters/mod.rs": "8ee6a2d20946318207140a9fb5c907ced88e4a7723bc4a6625e4b176d0f62d22",
+        "./crates/ail/src/lib.rs": "806293ea1b32ad8d0b69e2d6bbb9b3e8d53abb7a24f39d08edc56788a49c38c1",
+        "./crates/ail/src/main.rs": "a91320eb9f94b03c6a627370ded60ff40de17feac932346d302bec64d9e2e4ee",
+        "./crates/ail/src/phase.rs": "28d2aaaf4b9f87db5d10c04b1a4ced0ffa2de7294dd1236fd1231d0476b155a6",
+        "./crates/ail/src/phases/mod.rs": "012444bf6ada9117408af6902f52e3257cfbb6680c1bfd309349ba946cf4ce32",
+        "./crates/ail/src/phases/p1.rs": "5b2ffe98cbcf17df9204ecbf1a7c39baf1ccf773233495cc4414281cb93ab80e",
+        "./crates/ail/src/phases/p2.rs": "3837d4c5b5136633f681e9811a7098aa75e2a0e8c6bad169ad07de9be11cfeca",
+        "./crates/ail/src/phases/p3.rs": "958662ba5dd4f872babedc74c6fc8d27ca0858bcf749798a76ed0507bf879541",
+        "./crates/ail/src/phases/p4.rs": "edd9d140ef18628a21fd2d0d55b120d7b9249e1a2ab2ec610b5054d423742c1a",
+        "./crates/ail/src/phases/p5.rs": "ae7a82f861e9474de08858336a635eddf6f8db01fa3e854222aeb7c73e55533a",
+        "./crates/ail/src/phases/p6.rs": "fe2daf41b9ba60aea5217d6e8511d5b720931e6bc943f99a5ddb93d6a5323034",
+        "./crates/ail/src/phases/p7.rs": "a096a1a9256e9666bcde2a908e4f915cb6742ea156bf4777401957c6510a0814",
+        "./crates/ail/src/run.rs": "955663d7d192644887cb9ab8834b1d6faeb49a1ad5752812af5980034d6bbfac",
+        "./crates/ail/src/ui.rs": "929d6a7167658dfecde294ede18aeb79d91c426cfe251f2456c240f272d2f64c",
+        "./crates/ail/tests/demo.rs": "9cf9923354edb4bfd67a2131ca4ad7496c5d61f58e51851d4c4f27dcaa2efced"
+      }
+    },
+    "xtask": {
+      "hash": "d33fa02a951a72d1f6fe365b53b2504f643fc4b5cd9bb326816a405a1b67d65c",
+      "modules": {
+        "./xtask/Cargo.toml": "429b2ddf222812770724593a450a3851e5e6d34e682173055bab398405a623be",
+        "./xtask/src/main.rs": "1d5961e3099934bf47463bc36cda63b6be9a894d6f3e0ea002f0c133885cf797"
+      }
+    }
+  }
+}

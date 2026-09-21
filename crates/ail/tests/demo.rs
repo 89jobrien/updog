@@ -1,3 +1,5 @@
+//! End-to-end tests for phase outputs and failure handling.
+
 /// End-to-end demo: runs phases 1, 4, and 5 with a FakeTraceSource and
 /// asserts that the expected output files are produced.
 use std::fs;
@@ -10,9 +12,7 @@ use ail::run::{RunConfig, execute};
 use anyhow::Result;
 use tempfile::TempDir;
 
-// ---------------------------------------------------------------------------
 // Test double
-// ---------------------------------------------------------------------------
 
 struct FakeTraceSource(Vec<TraceRecord>);
 
@@ -74,9 +74,7 @@ fn fake_feedback() -> Feedback {
     }
 }
 
-// ---------------------------------------------------------------------------
 // Helpers
-// ---------------------------------------------------------------------------
 
 fn config_in(dir: &TempDir, start_phase: u8) -> RunConfig {
     RunConfig::new_with_dir(
@@ -89,9 +87,7 @@ fn config_in(dir: &TempDir, start_phase: u8) -> RunConfig {
     )
 }
 
-// ---------------------------------------------------------------------------
 // Tests
-// ---------------------------------------------------------------------------
 
 #[test]
 fn phase1_writes_traces_json() {

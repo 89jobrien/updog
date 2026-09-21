@@ -1,3 +1,5 @@
+//! Phase 3: generate Promptfoo baseline evals from feedback clusters.
+
 use std::fs;
 
 use agent_loop::Feedback;

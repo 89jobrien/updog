@@ -12,7 +12,8 @@ Agent: test. Loop iteration covering last 7 days of traces. Source: crs discover
 - **Action**: AddRule
 - **Evidence**: 13 occurrences
 - **Spec**:
-```
+
+```text
 # TODO: fill in the exact JSON/TOML block to add or modify
 ```
 
@@ -22,7 +23,7 @@ Agent: test. Loop iteration covering last 7 days of traces. Source: crs discover
 - **Action**: AddRule
 - **Evidence**: 4 occurrences
 - **Spec**:
-```
+
+```text
 # TODO: fill in the exact JSON/TOML block to add or modify
 ```
-

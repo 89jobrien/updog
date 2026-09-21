@@ -1,3 +1,5 @@
+//! `ail` command-line entry point for running agent improvement phases.
+
 use clap::{CommandFactory, Parser, Subcommand};
 use miette::Result;
 use tracing_subscriber::{EnvFilter, fmt};

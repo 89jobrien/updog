@@ -1,3 +1,5 @@
+//! Normalized trace records shared by collection adapters and loop phases.
+
 use serde::{Deserialize, Serialize};
 
 #[non_exhaustive]

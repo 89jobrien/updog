@@ -1,3 +1,5 @@
+//! Phase 1: collect and persist normalized SDK traces.
+
 use std::process::Command;
 
 use anyhow::Result;

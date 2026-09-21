@@ -1,3 +1,5 @@
+//! Workspace maintenance tasks for CI, Cargo Rail, and SARIF generation.
+
 use std::io::Write;
 use std::process::{Command, ExitCode, Stdio};
 
@@ -215,9 +217,7 @@ fn sarif() -> Result {
     Ok(())
 }
 
-// ---------------------------------------------------------------------------
 // Helpers
-// ---------------------------------------------------------------------------
 
 fn cargo() -> Command {
     let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".into());

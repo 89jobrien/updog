@@ -1,3 +1,5 @@
+//! Feedback categories, severities, and review clusters.
+
 use serde::{Deserialize, Serialize};
 
 #[non_exhaustive]
@@ -20,6 +22,7 @@ pub enum Severity {
 }
 
 impl Severity {
+    /// Returns the impact multiplier used by HALO scoring.
     pub fn weight(self) -> f64 {
         match self {
             Severity::P1 => 3.0,

@@ -1,3 +1,5 @@
+//! Implementations of the seven Agent Improvement Loop phases.
+
 pub mod p1;
 pub mod p2;
 pub mod p3;
@@ -8,6 +10,7 @@ pub mod p7;
 
 use crate::phase::Phase;
 
+/// Returns every phase in execution order.
 pub fn all_phases() -> Vec<Box<dyn Phase>> {
     vec![
         Box::new(p1::SdkTraces),

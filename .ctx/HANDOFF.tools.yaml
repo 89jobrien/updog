@@ -1,15 +1,17 @@
-generated: 2026-06-25
+generated: 2026-07-26
 since_days: 30
 sessions_scanned: 1
-total_commands: 12
+total_commands: 98
 top_supported:
-  - command: git diff
+  - command: cat >
+    count: 1
+    rule: no-cat-use-read
+    est_savings_tokens: 158
+  - command: git status
     count: 1
     rule: no-bash-use-nu
-    rtk_equivalent: rtk git
-    est_savings_tokens: 35
-    est_savings_pct: 80
+    est_savings_tokens: 132
 top_unhandled:
   - base_command: nu
-    count: 11
-    example: "nu -c \"cat /Users/joe/dev/updog/Cargo.toml | grep 'version'\""
+    count: 96
+    example: "nu -c \"cargo rail unify --check --help out+err>| grep -i 'format\\|output\\|sarif'..."

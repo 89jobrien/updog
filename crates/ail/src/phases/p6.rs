@@ -1,3 +1,5 @@
+//! Phase 6: describe gates for automated handoff execution.
+
 use anyhow::Result;
 
 use crate::phase::Phase;

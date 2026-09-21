@@ -1,3 +1,5 @@
+//! Phase 2: present trace evidence for human and LLM feedback.
+
 use anyhow::Result;
 use console::style;
 

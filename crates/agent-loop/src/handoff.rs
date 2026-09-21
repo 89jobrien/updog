@@ -1,3 +1,5 @@
+//! Codex handoff data and Markdown rendering.
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -22,6 +24,7 @@ pub struct Handoff {
 }
 
 impl Handoff {
+    /// Renders the handoff as ranked Markdown change instructions.
     pub fn to_markdown(&self) -> String {
         let mut out = format!(
             "# Agent Improvement Handoff — {}\n\n",

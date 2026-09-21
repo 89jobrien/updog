@@ -1,3 +1,5 @@
+//! Domain types and trace-source ports for agent improvement loops.
+
 pub mod diagnosis;
 pub mod feedback;
 pub mod halo;

@@ -1,3 +1,5 @@
+//! Trace collection port and its typed errors.
+
 use crate::traces::TraceRecord;
 
 #[non_exhaustive]
@@ -40,6 +42,7 @@ pub enum TraceError {
 /// }
 /// ```
 pub trait TraceSource {
+    /// Collects normalized trace records from the previous `since_days` days.
     fn collect(&self, since_days: u32) -> Result<Vec<TraceRecord>, TraceError>;
 }
 

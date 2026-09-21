@@ -1,3 +1,5 @@
+//! HALO prioritization scores for feedback clusters.
+
 use serde::{Deserialize, Serialize};
 
 use crate::feedback::FeedbackCluster;

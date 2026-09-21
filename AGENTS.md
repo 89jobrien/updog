@@ -101,7 +101,7 @@ pub struct HALOScore { /* ... */ }
 
 ## Project Structure
 
-```
+```text
 updog/
 ├── crates/
 │   ├── agent-loop/              # Domain types library
